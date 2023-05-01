@@ -1,7 +1,7 @@
 import './index.html';
 import './index.scss';
 
-let currentLanguage = 'en';
+let currentLanguage = null;
 const userLanguage = {
   'en': {
     'classic': [
@@ -250,29 +250,33 @@ function listenPhysicalKeyboard() {
   });
 }
 function initLanguage(){
-  if (window.navigator.language === 'Ru-ru'){
-    currentLanguage = 'ru';
+  if (localStorage.getItem('currentLanguage')){
+    currentLanguage = JSON.parse(localStorage.getItem('currentLanguage'));
+    console.log(currentLanguage);
   }
   else{
     currentLanguage = 'en';
+    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
   }
 }
 
 function changeLanguage(){
   if (currentLanguage === 'ru'){
     currentLanguage = 'en';
+    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
   }
   else{
     currentLanguage = 'ru';
+    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
   }
   updateKeyboard();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  initLanguage();
   initPage();
   listenVirtualKeyboard();
   listenPhysicalKeyboard();
-  initLanguage();
   document.onkeydown = function (event) {
     if (event.code === 'ControlLeft') {
       document.onkeyup = function (newEvent) {
