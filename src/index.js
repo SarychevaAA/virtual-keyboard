@@ -9,6 +9,17 @@ const keyboardLettersEn = [
   'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
 ];
 
+const keyboardLettersShiftEn = [
+  '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
+  'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '|', 'Del',
+  'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', 'Enter',
+  'Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '▲', 'Shift',
+  'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
+];
+
+let capsFlag = false;
+let shiftFlag = false;
+let positionCursor = 0;
 const keyboardCodes = [
   'Backquote', 'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5', 'Digit6', 'Digit7', 'Digit8', 'Digit9', 'Digit0', 'Minus', 'Equal', 'Backspace',
   'Tab', 'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY', 'KeyU', 'KeyI', 'KeyO', 'KeyP', 'BracketLeft', 'BracketRight', 'Backslash', 'Delete',
@@ -17,6 +28,8 @@ const keyboardCodes = [
   'ControlLeft', 'MetaLeft', 'AltLeft', 'Space', 'AltRight', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ControlRight',
 ];
 const specialLetters = ['Backspace', 'Tab', 'Del', 'Caps Lock', 'Enter', 'Shift', 'Ctrl', 'Win', 'Alt', 'Space', '◄', '▼', '►', '▲'];
+const specialCodes = ['Backspace', 'Tab', 'Delete', 'CapsLock', 'Enter', 'ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 'MetaLeft', 'AltLeft', 'AltRight', 'Space', 'ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp'];
+
 const rowLength = [14, 15, 13, 13, 9];
 const keyNumberStartRow = [0, 14, 29, 42, 55];
 
@@ -27,16 +40,31 @@ function createKeys(row) {
   keys.forEach((key, index) => {
     const keyElement = document.createElement('div');
     keyElement.classList.add('keyboard__key');
-    keyElement.textContent = key;
     if (specialLetters.includes(key)) {
+      keyElement.textContent = key;
       keyElement.classList.add('keyboard__key_special');
     } else {
+      keyElement.textContent = shiftFlag ? keyboardLettersShiftEn[keyNumberStartRow[row] + index]
+        : capsFlag ? key.toUpperCase() : key.toLowerCase();
       keyElement.classList.add('keyboard__key_classic');
     }
     keyElement.classList.add(keyboardCodes[keyNumberStartRow[row] + index]);
+    if (key === 'Caps Lock' && capsFlag) {
+      keyElement.classList.add('active');
+    }
     keyRow.push(keyElement);
   });
   return keyRow;
+}
+function addText(textArea, symbol) {
+  if (document.activeElement === textArea) {
+    positionCursor = textArea.selectionEnd;
+  }
+  const textAreaArray = textArea.textContent.split('');
+  const currentElement = textAreaArray[positionCursor];
+  textAreaArray.splice(positionCursor, 1, symbol, currentElement);
+  textArea.textContent = textAreaArray.join('');
+  positionCursor += 1;
 }
 
 function initKeyboardLayout() {
@@ -50,6 +78,7 @@ function initKeyboardLayout() {
   }
   return keyboardRows;
 }
+
 function initPage() {
   const body = document.querySelector('body');
   body.classList.add('page');
@@ -70,22 +99,138 @@ function initPage() {
   wrapper.append(textArea);
   wrapper.append(keyboard);
   wrapper.append(additionaltext);
-
   keyboard.append(...initKeyboardLayout());
+}
+
+function updateKeyboard() {
+  const keyboard = document.getElementsByClassName('keyboard')[0];
+  keyboard.innerHTML = '';
+  keyboard.append(...initKeyboardLayout());
+  listenVirtualKeyboard();
+}
+
+function InputSpecialKeys(keyCode, textArea) {
+  if (keyCode === 'ArrowLeft') {
+    addText(textArea, '◄');
+  } else if (keyCode === 'ArrowRight') {
+    addText(textArea, '►');
+  } else if (keyCode === 'ArrowDown') {
+    addText(textArea, '▼');
+  } else if (keyCode === 'ArrowUp') {
+    addText(textArea, '▲');
+  } else if (keyCode === 'Enter') {
+    addText(textArea, '\n');
+  } else if (keyCode === 'Space') {
+    addText(textArea, ' ');
+  } else if (keyCode === 'Tab') {
+    addText(textArea, '    ');
+    positionCursor += 3;
+  } else if (keyCode === 'CapsLock') {
+    capsFlag = !capsFlag;
+    updateKeyboard();
+  } else if (keyCode === 'Backspace') {
+    textArea.focus();
+    if (positionCursor >= 0 && textArea.selectionEnd > 0) {
+      positionCursor = textArea.selectionEnd - 1;
+      const textAreaArray = textArea.textContent.split('');
+      textAreaArray.splice(positionCursor, 1);
+      textArea.textContent = textAreaArray.join('');
+    } else {
+      positionCursor = textArea.selectionEnd;
+    }
+  } else if (keyCode === 'Delete') {
+    textArea.focus();
+    if (positionCursor < textArea.textContent.length
+        || textArea.selectionEnd < textArea.textContent.length) {
+      positionCursor = textArea.selectionEnd;
+      const textAreaArray = textArea.textContent.split('');
+      textAreaArray.splice(positionCursor, 1);
+      textArea.textContent = textAreaArray.join('');
+    }
+  } else if (keyCode === 'ShiftRight' || keyCode === 'ShiftLeft') {
+    shiftFlag = true;
+    updateKeyboard();
+  }
+}
+function listenVirtualKeyboard() {
+  const keyboardClassicKeys = document.getElementsByClassName('keyboard__key_classic');
+  const keyboardSpecialKeys = document.getElementsByClassName('keyboard__key_special');
+  for (const key of keyboardClassicKeys) {
+    key.addEventListener('mousedown', (event) => {
+      const keyCodeIndex = keyboardCodes
+        .indexOf(event.target.classList[event.target.classList.length - 1]);
+      event.target.classList.add('active');
+      const textArea = document.getElementsByClassName('text-area')[0];
+      addText(
+        textArea,
+        shiftFlag ? keyboardLettersShiftEn[keyCodeIndex] : capsFlag
+          ? keyboardLettersEn[keyCodeIndex].toUpperCase() : keyboardLettersEn[keyCodeIndex],
+      );
+      textArea.focus();
+    });
+    key.addEventListener('mouseup', (event) => {
+      event.target.classList.remove('active');
+    });
+  }
+  for (const key of keyboardSpecialKeys) {
+    key.addEventListener('mousedown', (event) => {
+      let keyCode = event.target.classList[event.target.classList.length - 1];
+      if (keyCode === 'active') keyCode = event.target.classList[event.target.classList.length - 2];
+      const textArea = document.getElementsByClassName('text-area')[0];
+      InputSpecialKeys(keyCode, textArea);
+      if (keyCode !== 'CapsLock') {
+        event.target.classList.add('active');
+      }
+      textArea.setSelectionRange(positionCursor, positionCursor);
+    });
+    key.addEventListener('mouseup', (event) => {
+      const keyCode = event.target.classList[event.target.classList.length - 1];
+      if (keyCode === 'ShiftRight' || keyCode === 'ShiftLeft') {
+        shiftFlag = false;
+        updateKeyboard();
+      }
+      if (event.target.classList[event.target.classList.length - 2] !== 'CapsLock') {
+        event.target.classList.remove('active');
+      }
+    });
+  }
+}
+
+function listenPhysicalKeyboard() {
+  window.addEventListener('keydown', (event) => {
+    event.preventDefault();
+    const activeCode = event.code;
+    const activeElement = document.querySelector(`.${activeCode}`);
+    const textArea = document.querySelector('.text-area');
+    if (!specialCodes.includes(activeCode)) {
+      activeElement.classList.add('active');
+      addText(textArea, shiftFlag ? keyboardLettersShiftEn[keyboardCodes.indexOf(event.code)]
+        : (capsFlag ? event.key.toUpperCase() : event.key));
+    }
+    InputSpecialKeys(activeCode, textArea);
+    if (specialCodes.includes(activeCode)) {
+      if (activeCode !== 'CapsLock') {
+        activeElement.classList.add('active');
+      }
+    }
+    textArea.setSelectionRange(positionCursor, positionCursor);
+  }, false);
+
+  window.addEventListener('keyup', (event) => {
+    const activeCode = event.code;
+    if (event.code === 'ShiftRight' || event.code === 'ShiftLeft') {
+      shiftFlag = false;
+      updateKeyboard();
+    }
+    if (activeCode !== 'CapsLock') {
+      const activeElement = document.querySelector(`.${activeCode}`);
+      activeElement.classList.remove('active');
+    }
+  });
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   initPage();
-});
-
-window.addEventListener('keydown', (event) => {
-  const activeCode = event.code;
-  const activeElement = document.querySelector(`.${activeCode}`);
-  activeElement.classList.add('active');
-});
-
-window.addEventListener('keyup', (event) => {
-  const activeCode = event.code;
-  const activeElement = document.querySelector(`.${activeCode}`);
-  activeElement.classList.remove('active');
+  listenVirtualKeyboard();
+  listenPhysicalKeyboard();
 });
