@@ -77,3 +77,15 @@ function initPage() {
 window.addEventListener('DOMContentLoaded', () => {
   initPage();
 });
+
+window.addEventListener('keydown', (event) => {
+  const activeCode = event.code;
+  const activeElement = document.querySelector(`.${activeCode}`);
+  activeElement.classList.add('active');
+});
+
+window.addEventListener('keyup', (event) => {
+  const activeCode = event.code;
+  const activeElement = document.querySelector(`.${activeCode}`);
+  activeElement.classList.remove('active');
+});

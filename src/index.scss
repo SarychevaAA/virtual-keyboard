@@ -3,6 +3,8 @@ $color-background-keyboard: rgb(42 118 65);
 $color-keyboard-key-element: rgb(255, 255, 255);
 $color-keyboard-key-classic: rgb(59 185 97);
 $color-keyboard-key-special: rgb(45, 107, 64);
+$color-keyboard-key-active: rgb(0, 255, 80);
+$color-keyboard-key-hover: rgb(150, 215, 123);
 $color-title: rgb(0, 126, 41);
 $size-standard-key: 60px;
 
@@ -66,8 +68,15 @@ body{
   margin-left: 5px;
   border-radius: 5px;
   color: $color-keyboard-key-element;
-  transition: all 3s;
+  transition: all 0.3s;
   display: inline-block;
+  &:hover{
+    background: $color-keyboard-key-hover;
+  }
+  &.active{
+    background: $color-keyboard-key-active;
+    border-radius: 30px;
+  }
 }
 
 .keyboard__row{
