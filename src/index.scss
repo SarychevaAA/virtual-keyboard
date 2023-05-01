@@ -83,24 +83,24 @@ body{
   background: $color-keyboard-key-special;
 }
 
-.backspace{
+.Backspace{
   width: $size-standard-key*2 + 15px;
 }
 
-.space{
+.Space{
   width: $size-standard-key*7 + 40px;
 }
 
-.enter,
-.shiftRgt{
+.Enter,
+.ShiftRight{
   width: $size-standard-key*2;
 }
 
-.caps,
-.shiftLft {
+.CapsLock,
+.ShiftLeft {
   width: $size-standard-key*2 + 20px;
 }
 
-.tab{
+.Tab{
   width: $size-standard-key + 10px;
 }
