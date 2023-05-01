@@ -25,7 +25,7 @@ function createKeys(row) {
     .slice(keyNumberStartRow[row], keyNumberStartRow[row] + rowLength[row]);
   const keyRow = [];
   keys.forEach((key, index) => {
-    const keyElement = document.createElement('button');
+    const keyElement = document.createElement('div');
     keyElement.classList.add('keyboard__key');
     keyElement.textContent = key;
     if (specialLetters.includes(key)) {
