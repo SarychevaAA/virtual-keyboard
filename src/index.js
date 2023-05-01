@@ -1,6 +1,7 @@
 import './index.html';
 import './index.scss';
 
+let languageFlag = false;
 let currentLanguage = null;
 const userLanguage = {
   'en': {
@@ -191,6 +192,7 @@ function listenVirtualKeyboard() {
         shiftFlag ? userLanguage[currentLanguage].shift[keyCodeIndex] : capsFlag
           ? userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase() : userLanguage[currentLanguage].classic[keyCodeIndex],
       );
+
       textArea.setSelectionRange(positionCursor, positionCursor);
       textArea.focus();
     });
@@ -207,6 +209,7 @@ function listenVirtualKeyboard() {
       if (keyCode !== 'CapsLock') {
         event.target.classList.add('active');
       }
+      if (Array.from(key.classList).includes('ControlLeft')) languageFlag = true;
       textArea.setSelectionRange(positionCursor, positionCursor);
     });
     key.addEventListener('mouseup', (event) => {
@@ -214,6 +217,10 @@ function listenVirtualKeyboard() {
       if (keyCode === 'ShiftRight' || keyCode === 'ShiftLeft') {
         shiftFlag = false;
         updateKeyboard();
+      }
+      if ((Array.from(event.target.classList).includes('AltLeft') || Array.from(event.target.classList).includes('AltRight')) && languageFlag === true) {
+        languageFlag = false;
+        changeLanguage();
       }
       if (event.target.classList[event.target.classList.length - 2] !== 'CapsLock') {
         event.target.classList.remove('active');
@@ -238,6 +245,10 @@ function listenPhysicalKeyboard() {
       if (activeCode !== 'CapsLock') {
         activeElement.classList.add('active');
       }
+      if (activeCode === 'ControlLeft') {
+        languageFlag = true;
+      }
+
     }
     textArea.setSelectionRange(positionCursor, positionCursor);
   }, false);
@@ -247,6 +258,10 @@ function listenPhysicalKeyboard() {
     if (event.code === 'ShiftRight' || event.code === 'ShiftLeft') {
       shiftFlag = false;
       updateKeyboard();
+    }
+    if ((activeCode === 'AltLeft' || activeCode === 'AltRight') && languageFlag === true) {
+      languageFlag = false;
+      changeLanguage();
     }
     if (activeCode !== 'CapsLock') {
       const activeElement = document.querySelector(`.${activeCode}`);
@@ -282,16 +297,4 @@ window.addEventListener('DOMContentLoaded', () => {
   initPage();
   listenVirtualKeyboard();
   listenPhysicalKeyboard();
-  document.onkeydown = function (event) {
-    if (event.code === 'ControlLeft') {
-      document.onkeyup = function (newEvent) {
-        if (newEvent.code === 'AltLeft' || newEvent.code === 'AltRight') {
-          changeLanguage();
-        }
-        else {
-          document.onkeyup = null;
-        }
-      };
-    }
-  };
 });
