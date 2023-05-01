@@ -1,21 +1,41 @@
 import './index.html';
 import './index.scss';
 
-const keyboardLettersEn = [
-  '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
-  'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
-  'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
-  'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '▲', 'Shift',
-  'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
-];
-
-const keyboardLettersShiftEn = [
-  '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
-  'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '|', 'Del',
-  'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', 'Enter',
-  'Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '▲', 'Shift',
-  'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
-];
+let currentLanguage = 'en';
+const userLanguage = {
+  'en': {
+    'classic': [
+      '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+      'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
+      'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
+      'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '▲', 'Shift',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
+    ],
+    'shift': [
+      '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
+      'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '|', 'Del',
+      'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', 'Enter',
+      'Shift', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', '▲', 'Shift',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
+    ],
+  },
+  'ru': {
+    'classic': [
+      'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
+      'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\', 'Del',
+      'Caps Lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
+      'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '▲', 'Shift',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
+    ],
+    'shift': [
+      'Ё', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '-', '=', 'Backspace',
+      'Tab', 'Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ', '\\', 'Del',
+      'Caps Lock', 'Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э', 'Enter',
+      'Shift', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', ',', '▲', 'Shift',
+      'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
+    ],
+  }
+}
 
 let capsFlag = false;
 let shiftFlag = false;
@@ -34,7 +54,7 @@ const rowLength = [14, 15, 13, 13, 9];
 const keyNumberStartRow = [0, 14, 29, 42, 55];
 
 function createKeys(row) {
-  const keys = keyboardLettersEn
+  const keys = userLanguage[currentLanguage].classic
     .slice(keyNumberStartRow[row], keyNumberStartRow[row] + rowLength[row]);
   const keyRow = [];
   keys.forEach((key, index) => {
@@ -44,7 +64,7 @@ function createKeys(row) {
       keyElement.textContent = key;
       keyElement.classList.add('keyboard__key_special');
     } else {
-      keyElement.textContent = shiftFlag ? keyboardLettersShiftEn[keyNumberStartRow[row] + index]
+      keyElement.textContent = shiftFlag ? userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index]
         : capsFlag ? key.toUpperCase() : key.toLowerCase();
       keyElement.classList.add('keyboard__key_classic');
     }
@@ -163,9 +183,10 @@ function listenVirtualKeyboard() {
       const textArea = document.getElementsByClassName('text-area')[0];
       addText(
         textArea,
-        shiftFlag ? keyboardLettersShiftEn[keyCodeIndex] : capsFlag
-          ? keyboardLettersEn[keyCodeIndex].toUpperCase() : keyboardLettersEn[keyCodeIndex],
+        shiftFlag ? userLanguage[currentLanguage].shift[keyCodeIndex] : capsFlag
+          ? userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase() : userLanguage[currentLanguage].classic[keyCodeIndex],
       );
+      textArea.setSelectionRange(positionCursor, positionCursor);
       textArea.focus();
     });
     key.addEventListener('mouseup', (event) => {
@@ -204,7 +225,7 @@ function listenPhysicalKeyboard() {
     const textArea = document.querySelector('.text-area');
     if (!specialCodes.includes(activeCode)) {
       activeElement.classList.add('active');
-      addText(textArea, shiftFlag ? keyboardLettersShiftEn[keyboardCodes.indexOf(event.code)]
+      addText(textArea, shiftFlag ? userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)]
         : (capsFlag ? event.key.toUpperCase() : event.key));
     }
     InputSpecialKeys(activeCode, textArea);
@@ -228,9 +249,40 @@ function listenPhysicalKeyboard() {
     }
   });
 }
+function initLanguage(){
+  if (window.navigator.language === 'Ru-ru'){
+    currentLanguage = 'ru';
+  }
+  else{
+    currentLanguage = 'en';
+  }
+}
+
+function changeLanguage(){
+  if (currentLanguage === 'ru'){
+    currentLanguage = 'en';
+  }
+  else{
+    currentLanguage = 'ru';
+  }
+  updateKeyboard();
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   initPage();
   listenVirtualKeyboard();
   listenPhysicalKeyboard();
+  initLanguage();
+  document.onkeydown = function (event) {
+    if (event.code === 'ControlLeft') {
+      document.onkeyup = function (newEvent) {
+        if (newEvent.code === 'AltLeft' || newEvent.code === 'AltRight') {
+          changeLanguage();
+        }
+        else {
+          document.onkeyup = null;
+        }
+      };
+    }
+  };
 });
