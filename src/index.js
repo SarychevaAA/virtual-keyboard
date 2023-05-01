@@ -67,8 +67,12 @@ function createKeys(row) {
       keyElement.classList.add('keyboard__key_special');
     } else {
       let text = key.toLowerCase();
-      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index];
-      else if (capsFlag) text = key.toUpperCase();
+      if (shiftFlag && !capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index];
+      }
+      if (shiftFlag && capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index].toLowerCase();
+      } else if (capsFlag) text = key.toUpperCase();
       keyElement.textContent = text;
       keyElement.classList.add('keyboard__key_classic');
     }
@@ -203,10 +207,12 @@ function listenVirtualKeyboard() {
       event.target.classList.add('active');
       const textArea = document.getElementsByClassName('text-area')[0];
       let text = userLanguage[currentLanguage].classic[keyCodeIndex];
-      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyCodeIndex];
-      else if (capsFlag) text = userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase();
+      if (shiftFlag && !capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyCodeIndex];
+      } else if (shiftFlag && capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyCodeIndex].toLowerCase();
+      } else if (capsFlag) text = userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase();
       addText(text);
-
       textArea.setSelectionRange(positionCursor, positionCursor);
       textArea.focus();
     });
@@ -227,8 +233,7 @@ function listenVirtualKeyboard() {
       textArea.setSelectionRange(positionCursor, positionCursor);
     });
     key.addEventListener('mouseup', (event) => {
-      const keyCode = event.target.classList[event.target.classList.length - 1];
-      if (keyCode === 'ShiftRight' || keyCode === 'ShiftLeft') {
+      if (event.target.classList[event.target.classList.length - 2] === 'ShiftRight' || event.target.classList[event.target.classList.length - 2] === 'ShiftLeft') {
         shiftFlag = false;
         updateKeyboard();
       }
@@ -252,8 +257,13 @@ function listenPhysicalKeyboard() {
     if (!specialCodes.includes(activeCode)) {
       activeElement.classList.add('active');
       let text = event.key;
-      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)];
-      else if (capsFlag) text = event.key.toUpperCase();
+      if (shiftFlag && !capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)];
+      } else if (shiftFlag && capsFlag) {
+        text = userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)].toLowerCase();
+      } else if (capsFlag) {
+        text = event.key.toUpperCase();
+      }
       addText(text);
     }
     InputSpecialKeys(activeCode, textArea);
