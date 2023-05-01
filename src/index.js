@@ -4,15 +4,15 @@ import './index.scss';
 let languageFlag = false;
 let currentLanguage = null;
 const userLanguage = {
-  'en': {
-    'classic': [
+  en: {
+    classic: [
       '`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
       'Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\', 'Del',
       'Caps Lock', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', 'Enter',
       'Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', '▲', 'Shift',
       'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
     ],
-    'shift': [
+    shift: [
       '~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 'Backspace',
       'Tab', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '|', 'Del',
       'Caps Lock', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', 'Enter',
@@ -20,23 +20,23 @@ const userLanguage = {
       'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
     ],
   },
-  'ru': {
-    'classic': [
+  ru: {
+    classic: [
       'ё', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 'Backspace',
       'Tab', 'й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х', 'ъ', '\\', 'Del',
       'Caps Lock', 'ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э', 'Enter',
       'Shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', '.', '▲', 'Shift',
       'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
     ],
-    'shift': [
+    shift: [
       'Ё', '!', '"', '№', ';', '%', ':', '?', '*', '(', ')', '-', '=', 'Backspace',
       'Tab', 'Й', 'Ц', 'У', 'К', 'Е', 'Н', 'Г', 'Ш', 'Щ', 'З', 'Х', 'Ъ', '\\', 'Del',
       'Caps Lock', 'Ф', 'Ы', 'В', 'А', 'П', 'Р', 'О', 'Л', 'Д', 'Ж', 'Э', 'Enter',
       'Shift', 'Я', 'Ч', 'С', 'М', 'И', 'Т', 'Ь', 'Б', 'Ю', ',', '▲', 'Shift',
       'Ctrl', 'Win', 'Alt', 'Space', 'Alt', '◄', '▼', '►', 'Ctrl',
     ],
-  }
-}
+  },
+};
 
 let capsFlag = false;
 let shiftFlag = false;
@@ -66,22 +66,25 @@ function createKeys(row) {
       keyElement.textContent = key;
       keyElement.classList.add('keyboard__key_special');
     } else {
-      keyElement.textContent = shiftFlag ? userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index]
-        : capsFlag ? key.toUpperCase() : key.toLowerCase();
+      let text = key.toLowerCase();
+      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyNumberStartRow[row] + index];
+      else if (capsFlag) text = key.toUpperCase();
+      keyElement.textContent = text;
       keyElement.classList.add('keyboard__key_classic');
     }
     keyElement.classList.add(keyboardCodes[keyNumberStartRow[row] + index]);
     if (key === 'Caps Lock' && capsFlag) {
       keyElement.classList.add('active');
     }
-    if (key === 'Shift' && shiftFlag && keyboardCodes[keyNumberStartRow[row] + index] === shiftType){
+    if (key === 'Shift' && shiftFlag && keyboardCodes[keyNumberStartRow[row] + index] === shiftType) {
       keyElement.classList.add('active');
     }
     keyRow.push(keyElement);
   });
   return keyRow;
 }
-function addText(textArea, symbol) {
+function addText(symbol) {
+  const textArea = document.querySelector('.text-area');
   if (document.activeElement === textArea) {
     positionCursor = textArea.selectionEnd;
   }
@@ -134,21 +137,22 @@ function updateKeyboard() {
   listenVirtualKeyboard();
 }
 
-function InputSpecialKeys(keyCode, textArea) {
+function InputSpecialKeys(keyCode) {
+  const textArea = document.querySelector('.text-area');
   if (keyCode === 'ArrowLeft') {
-    addText(textArea, '◄');
+    addText('◄');
   } else if (keyCode === 'ArrowRight') {
-    addText(textArea, '►');
+    addText('►');
   } else if (keyCode === 'ArrowDown') {
-    addText(textArea, '▼');
+    addText('▼');
   } else if (keyCode === 'ArrowUp') {
-    addText(textArea, '▲');
+    addText('▲');
   } else if (keyCode === 'Enter') {
-    addText(textArea, '\n');
+    addText('\n');
   } else if (keyCode === 'Space') {
-    addText(textArea, ' ');
+    addText(' ');
   } else if (keyCode === 'Tab') {
-    addText(textArea, '    ');
+    addText('    ');
     positionCursor += 3;
   } else if (keyCode === 'CapsLock') {
     capsFlag = !capsFlag;
@@ -178,20 +182,30 @@ function InputSpecialKeys(keyCode, textArea) {
     updateKeyboard();
   }
 }
+
+function changeLanguage() {
+  if (currentLanguage === 'ru') {
+    currentLanguage = 'en';
+    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
+  } else {
+    currentLanguage = 'ru';
+    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
+  }
+  updateKeyboard();
+}
 function listenVirtualKeyboard() {
   const keyboardClassicKeys = document.getElementsByClassName('keyboard__key_classic');
   const keyboardSpecialKeys = document.getElementsByClassName('keyboard__key_special');
-  for (const key of keyboardClassicKeys) {
+  Array.from(keyboardClassicKeys).forEach((key) => {
     key.addEventListener('mousedown', (event) => {
       const keyCodeIndex = keyboardCodes
         .indexOf(event.target.classList[event.target.classList.length - 1]);
       event.target.classList.add('active');
       const textArea = document.getElementsByClassName('text-area')[0];
-      addText(
-        textArea,
-        shiftFlag ? userLanguage[currentLanguage].shift[keyCodeIndex] : capsFlag
-          ? userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase() : userLanguage[currentLanguage].classic[keyCodeIndex],
-      );
+      let text = userLanguage[currentLanguage].classic[keyCodeIndex];
+      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyCodeIndex];
+      else if (capsFlag) text = userLanguage[currentLanguage].classic[keyCodeIndex].toUpperCase();
+      addText(text);
 
       textArea.setSelectionRange(positionCursor, positionCursor);
       textArea.focus();
@@ -199,8 +213,8 @@ function listenVirtualKeyboard() {
     key.addEventListener('mouseup', (event) => {
       event.target.classList.remove('active');
     });
-  }
-  for (const key of keyboardSpecialKeys) {
+  });
+  Array.from(keyboardSpecialKeys).forEach((key) => {
     key.addEventListener('mousedown', (event) => {
       let keyCode = event.target.classList[event.target.classList.length - 1];
       if (keyCode === 'active') keyCode = event.target.classList[event.target.classList.length - 2];
@@ -226,7 +240,7 @@ function listenVirtualKeyboard() {
         event.target.classList.remove('active');
       }
     });
-  }
+  });
 }
 
 function listenPhysicalKeyboard() {
@@ -237,8 +251,10 @@ function listenPhysicalKeyboard() {
     const textArea = document.querySelector('.text-area');
     if (!specialCodes.includes(activeCode)) {
       activeElement.classList.add('active');
-      addText(textArea, shiftFlag ? userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)]
-        : (capsFlag ? event.key.toUpperCase() : event.key));
+      let text = event.key;
+      if (shiftFlag) text = userLanguage[currentLanguage].shift[keyboardCodes.indexOf(event.code)];
+      else if (capsFlag) text = event.key.toUpperCase();
+      addText(text);
     }
     InputSpecialKeys(activeCode, textArea);
     if (specialCodes.includes(activeCode)) {
@@ -248,7 +264,6 @@ function listenPhysicalKeyboard() {
       if (activeCode === 'ControlLeft') {
         languageFlag = true;
       }
-
     }
     textArea.setSelectionRange(positionCursor, positionCursor);
   }, false);
@@ -269,27 +284,13 @@ function listenPhysicalKeyboard() {
     }
   });
 }
-function initLanguage(){
-  if (localStorage.getItem('currentLanguage')){
+function initLanguage() {
+  if (localStorage.getItem('currentLanguage')) {
     currentLanguage = JSON.parse(localStorage.getItem('currentLanguage'));
-    console.log(currentLanguage);
-  }
-  else{
+  } else {
     currentLanguage = 'en';
     localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
   }
-}
-
-function changeLanguage(){
-  if (currentLanguage === 'ru'){
-    currentLanguage = 'en';
-    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
-  }
-  else{
-    currentLanguage = 'ru';
-    localStorage.setItem('currentLanguage', JSON.stringify(currentLanguage));
-  }
-  updateKeyboard();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
