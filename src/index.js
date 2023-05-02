@@ -272,7 +272,7 @@ class Keyboard {
       const textArea = document.querySelector('.text-area');
       if (!this.specialCodes.includes(activeCode)) {
         activeElement.classList.add('active');
-        let text = event.key.toLowerCase();
+        let text = this.userLanguage[this.currentLanguage].classic[[this.keyboardCodes.indexOf(event.code)]].toLowerCase();
         if (this.shiftFlag && !this.capsFlag) {
           text = this.userLanguage[this.currentLanguage]
             .shift[this.keyboardCodes.indexOf(event.code)];
