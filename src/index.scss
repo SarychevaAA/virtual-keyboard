@@ -1,0 +1,120 @@
+$color-text-area: rgba(50 115 50);
+$color-background-keyboard: rgb(42 118 65);
+$color-keyboard-key-element: rgb(255, 255, 255);
+$color-keyboard-key-classic: rgb(59 185 97);
+$color-keyboard-key-special: rgb(45, 107, 64);
+$color-keyboard-key-active: rgb(0, 255, 80);
+$color-keyboard-key-hover: rgb(150, 215, 123);
+$color-title: rgb(0, 126, 41);
+$size-standard-key: 60px;
+
+body{
+  margin: 0;
+  padding: 0;
+}
+
+.page{
+  background: linear-gradient( rgba(208, 255, 199, 0.45), rgba(208, 255, 199, 0.65) ), url('./img/page-background.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: top;
+}
+
+.wrapper{
+  width: 80%;
+  margin: 5% auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  align-items: center;
+}
+
+.title{
+  color: $color-title;
+  font-size: 40px;
+  text-shadow: #FFF 1px 0 3px;
+}
+
+.additional-text{
+  text-align: center;
+  font-size: 22px;
+  width: 925px;
+}
+.text-area{
+  width: 1010px;
+  border: 1px solid $color-text-area;
+  height: 150px;
+  box-shadow: 0 5px 10px 0 $color-text-area;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 18px;
+  &:focus-visible{
+    outline: 0;
+  }
+}
+
+.keyboard{
+  padding: 10px 10px;
+  background: $color-background-keyboard;
+  height: 327px;
+  width: 990px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px 0 $color-text-area;
+}
+
+.keyboard__key{
+  height: $size-standard-key;
+  width: $size-standard-key;
+  text-align: center;
+  line-height: $size-standard-key;
+  margin-left: 5px;
+  border-radius: 5px;
+  color: $color-keyboard-key-element;
+  transition: all 0.3s;
+  display: inline-block;
+  user-select: none;
+  &:hover{
+    background: $color-keyboard-key-hover;
+  }
+  &.active{
+    background: $color-keyboard-key-active;
+    border-radius: 10px;
+  }
+}
+
+.keyboard__row{
+  clear: both;
+  width: 100%;
+  height: $size-standard-key;
+  margin-bottom: 7px;
+}
+.keyboard__key_classic{
+  background: $color-keyboard-key-classic;
+}
+
+.keyboard__key_special{
+  background: $color-keyboard-key-special;
+}
+
+.Backspace{
+  width: $size-standard-key*2 + 15px;
+}
+
+.Space{
+  width: $size-standard-key*7 + 40px;
+}
+
+.Enter,
+.ShiftRight{
+  width: $size-standard-key*2;
+}
+
+.CapsLock,
+.ShiftLeft {
+  width: $size-standard-key*2 + 20px;
+}
+
+.Tab{
+  width: $size-standard-key + 10px;
+}
